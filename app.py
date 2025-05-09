@@ -64,47 +64,56 @@ elif menu == "Portafoglio simulato":
                 st.warning(f"Errore su {t}")
 
 elif menu == "Consulenza personalizzata":
-    st.subheader("🧑‍⚖️ Consulenza dettagliata per profilo utente")
+    st.subheader("🧑‍⚖️ Consulenza personalizzata – Guida operativa")
 
     with st.form("profilo_cliente"):
-        eta = st.number_input("Età", 18, 100, 45)
-        capitale = st.number_input("Capitale disponibile (€)", 1000, 1000000, 25000)
+        eta = st.number_input("Età", 18, 100, 40)
+        capitale = st.number_input("Capitale disponibile (€)", 1000, 1000000, 20000)
         rischio = st.selectbox("Rischio", ["Basso", "Medio", "Alto"])
-        orizzonte = st.selectbox("Orizzonte", ["1-3 anni", "3-5 anni", "5+ anni"])
-        obiettivo = st.selectbox("Obiettivo", ["Protezione", "Crescita", "Alta crescita"])
-        invia = st.form_submit_button("📊 Genera piano")
+        orizzonte = st.selectbox("Durata dell’investimento", ["1-3 anni", "3-5 anni", "5+ anni"])
+        obiettivo = st.selectbox("Obiettivo", ["Protezione", "Crescita controllata", "Massima crescita"])
+        invia = st.form_submit_button("📊 Crea piano dettagliato")
 
     if invia:
-        st.write("### 💼 Piano operativo consigliato")
-        if rischio == "Basso":
-            st.write("- ✅ Obbligazioni europee a breve termine")
-            st.write("- ✅ Liquidità su conto deposito")
-            st.write("- ✅ ETF: iShares Euro Government Bond 1-3yr (IBGL.DE)")
-        elif rischio == "Medio":
-            st.write("- ✅ ETF: Vanguard FTSE All-World (VWCE.DE)")
-            st.write("- ✅ ETF: iShares Euro Corporate Bond (IEAC.DE)")
-            st.write("- ✅ 10% cash per opportunità future")
-        else:
-            st.write("- ✅ Azioni suggerite:")
-            for titolo in ["STM.MI", "LUX.MI", "UCG.MI"]:
-                try:
-                    hist = yf.Ticker(titolo).history(period="6mo")
-                    rend = (hist["Close"].iloc[-1] - hist["Close"].iloc[0]) / hist["Close"].iloc[0]
-                    st.markdown(f"  - **{titolo}**: rendimento 6 mesi = {rend*100:.2f}%")
-                except:
-                    st.markdown(f"  - {titolo}: dati non disponibili")
-            st.write("- ✅ ETF: iShares Digitalisation (DGTL.DE)")
+        st.write("### 📘 Strategia consigliata per profilo:")
+        st.markdown(f"- **Età:** {eta} anni")
+        st.markdown(f"- **Rischio:** {rischio}")
+        st.markdown(f"- **Orizzonte:** {orizzonte}")
+        st.markdown(f"- **Obiettivo:** {obiettivo}")
+        st.markdown("---")
 
-        st.write("### 📝 Strategia dettagliata")
-        st.write("Distribuzione consigliata:")
         if rischio == "Basso":
-            alloc = {"ETF Obbligazionario": 0.6, "Conto deposito": 0.3, "Altro": 0.1}
+            st.markdown("**PASSO 1:** Investi 70% (€{:.2f}) su ETF obbligazionari come:".format(capitale * 0.7))
+            st.markdown("- iShares Euro Government Bond 1-3yr (IBGL.DE)")
+            st.markdown("**PASSO 2:** Mantieni 30% (€{:.2f}) su liquidità (conto deposito 2–3%).".format(capitale * 0.3))
+            st.info("✔️ Piano a rischio minimo con protezione del capitale.")
         elif rischio == "Medio":
-            alloc = {"ETF Azionario globale": 0.5, "ETF Obbligazionario": 0.3, "Liquidità": 0.2}
+            st.markdown("**PASSO 1:** Investi 50% (€{:.2f}) su ETF azionario globale:".format(capitale * 0.5))
+            st.markdown("- Vanguard FTSE All-World (VWCE.DE)")
+            st.markdown("**PASSO 2:** Investi 30% (€{:.2f}) su ETF obbligazionario:".format(capitale * 0.3))
+            st.markdown("- iShares Euro Corp Bond (IEAC.DE)")
+            st.markdown("**PASSO 3:** Mantieni 20% cash per flessibilità.")
+            st.info("✔️ Diversificazione ed equilibrio tra crescita e stabilità.")
         else:
-            alloc = {"Azioni": 0.6, "ETF Tematici": 0.3, "Cash": 0.1}
-        for voce, perc in alloc.items():
-            st.markdown(f"- **{voce}**: {perc*100:.0f}% → €{capitale * perc:,.2f}")
+            st.markdown("**PASSO 1:** Acquista le seguenti azioni italiane con buone prospettive:")
+            azioni = ["STM.MI", "LUX.MI", "UCG.MI"]
+            for t in azioni:
+                try:
+                    h = yf.Ticker(t).history(period="6mo")
+                    rend = (h["Close"].iloc[-1] - h["Close"].iloc[0]) / h["Close"].iloc[0]
+                    st.markdown(f"- **{t}** → rendimento 6 mesi: **{rend*100:.2f}%**")
+                except:
+                    st.markdown(f"- **{t}** → dati non disponibili")
+
+            st.markdown("**PASSO 2:** Aggiungi ETF tematico:")
+            st.markdown("- iShares Digitalisation (DGTL.DE)")
+            st.markdown("**PASSO 3:** Tieni 10% (€{:.2f}) in cash per opportunità future.".format(capitale * 0.1))
+            st.info("✔️ Strategia aggressiva per crescita a lungo termine.")
+
+        st.markdown("### 🔁 Ribilanciamento e monitoraggio")
+        st.markdown("- **Controllo trimestrale** del portafoglio")
+        st.markdown("- **Ribilancia** se una componente supera il +10% rispetto al peso iniziale")
+        st.markdown("- Rivedi strategia se cambiano obiettivi o orizzonte temporale")
 elif menu == "Screener azioni italiane":
     st.subheader("🔎 Classifica azioni italiane")
     titoli = ["ENI.MI", "UCG.MI", "STM.MI", "ATL.MI", "LUX.MI", "ISP.MI"]
@@ -123,29 +132,45 @@ elif menu == "Screener azioni italiane":
     if rows:
         st.dataframe(pd.DataFrame(rows).set_index("Ticker").sort_values("ROE %", ascending=False))
 elif menu == "AI Consulente":
-    st.subheader("🤖 AI Consulente – Azione diretta")
+    st.subheader("🤖 AI Consulente – Guida passo-passo")
 
-    capitale = st.number_input("Capitale investibile (€)", 1000, 1_000_000, 20000)
-    rischio = st.selectbox("Profilo rischio", ["Basso", "Medio", "Alto"])
-    orizzonte = st.selectbox("Orizzonte", ["1-3 anni", "3-5 anni", "5+ anni"])
-    obiettivo = st.selectbox("Obiettivo", ["Rendimento costante", "Crescita equilibrata", "Alta performance"])
+    capitale = st.number_input("Capitale da investire (€)", 1000, 1_000_000, 20000)
+    rischio = st.selectbox("Tolleranza al rischio", ["Basso", "Medio", "Alto"])
+    orizzonte = st.selectbox("Durata investimento", ["1-3 anni", "3-5 anni", "5+ anni"])
+    obiettivo = st.selectbox("Obiettivo primario", ["Stabilità", "Crescita controllata", "Massimo rendimento"])
 
-    if st.button("🧠 Genera raccomandazione reale"):
-        st.write("### ✅ Azioni suggerite da eseguire ora")
+    if st.button("🚀 Avvia raccomandazione"):
+        st.write("### ✅ Piano consigliato con azioni concrete")
         if rischio == "Basso":
-            st.write("- Compra **IBGL.DE** – ETF obbligazionario euro breve scadenza")
-            st.write("- Mantieni 30% in **liquidità** su conto vincolato")
+            st.markdown("**PASSO 1:** Destina **70% del capitale (€{:.2f})** su ETF obbligazionari come:".format(capitale * 0.7))
+            st.markdown("- iShares Euro Government Bond 1-3yr (**IBGL.DE**) – ETF a bassa volatilità")
+            st.markdown("**PASSO 2:** Mantieni **30% (€{:.2f})** in conto deposito o liquidità.".format(capitale * 0.3))
+            st.info("✔️ Obiettivo: massima protezione del capitale con rendimento modesto (1.5–3%)")
         elif rischio == "Medio":
-            st.write("- Compra **VWCE.DE** – ETF mondo a replica fisica")
-            st.write("- Compra **IEAC.DE** – ETF obbligazionario corporate")
+            st.markdown("**PASSO 1:** Investi **50% (€{:.2f})** su ETF globale:".format(capitale * 0.5))
+            st.markdown("- Vanguard FTSE All-World (**VWCE.DE**)")
+            st.markdown("**PASSO 2:** Allocare **30% (€{:.2f})** su ETF obbligazionario:".format(capitale * 0.3))
+            st.markdown("- iShares Euro Corp Bond (**IEAC.DE**)")
+            st.markdown("**PASSO 3:** Lascia 20% liquido.")
+            st.info("✔️ Obiettivo: crescita moderata e diversificazione geografica")
         else:
-            st.write("- Compra **STM.MI**, **LUX.MI**, **UCG.MI**")
-            st.write("- Aggiungi ETF tematico: **DGTL.DE**")
-            st.write("- Mantieni 10% liquido per occasioni future")
+            st.markdown("**PASSO 1:** Compra i seguenti titoli con performance recente positiva:")
+            azioni = ["STM.MI", "LUX.MI", "UCG.MI"]
+            for t in azioni:
+                try:
+                    h = yf.Ticker(t).history(period="6mo")
+                    rend = (h["Close"].iloc[-1] - h["Close"].iloc[0]) / h["Close"].iloc[0]
+                    st.markdown(f"- **{t}** – Rendimento 6 mesi: **{rend*100:.2f}%**")
+                except:
+                    st.markdown(f"- **{t}** – dati non disponibili")
+            st.markdown("**PASSO 2:** Acquista ETF tematico:")
+            st.markdown("- iShares Digitalisation (**DGTL.DE**)")
+            st.markdown("**PASSO 3:** Tieni il 10% pronto per opportunità.")
+            st.info("✔️ Obiettivo: massimo potenziale di rendimento con elevata esposizione al rischio")
 
-        st.write("### 🔁 Valuta vendita di:")
-        st.write("- Titoli con perdita > 10% negli ultimi 6 mesi")
-        st.write("- ETF difensivi se sei in fase di accumulo")
+        st.write("### 📌 Azioni da evitare o vendere")
+        st.markdown("- Titoli con perdita >10% ultimi 6 mesi")
+        st.markdown("- ETF difensivi se non coerenti col profilo")
 
-        st.write("### 🧠 Motivazione AI:")
-        st.write("Analisi basata su rendimento storico 6 mesi, scenario macroeconomico e coerenza con obiettivi definiti.")
+        st.write("### 📋 Ricorda:")
+        st.markdown("Effettua un controllo ogni **3 mesi** e **ribilancia** se una categoria supera il +10% rispetto al target.")
