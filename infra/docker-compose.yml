@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: aion-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aion
+      POSTGRES_PASSWORD: aion
+      POSTGRES_DB: aion
+    ports:
+      - "5432:5432"
+    volumes:
+      - aion-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  aion-postgres-data:
