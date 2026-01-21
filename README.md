@@ -1,23 +1,60 @@
-# MINV Pro – App Intelligente di Analisi e Consulenza Finanziaria
+# AION OS Monorepo
 
-Questa app include:
-- Dashboard mercati
-- Analisi azienda con PDF, grafici, alert e notizie
-- Consulenza personalizzata guidata
-- AI Consulente con raccomandazioni automatiche
-- Screener azioni italiane
-- Download PDF + simulazioni
+AION OS is a monorepo containing the web control plane, API service, shared
+schemas, and infrastructure manifests.
 
-## ✅ Come eseguire localmente
+## Structure
 
-```bash
-pip install -r requirements.txt
-streamlit run app.py
+```
+apps/
+  api/        FastAPI service
+  web/        Next.js (TypeScript, App Router) + Tailwind
+infra/        Docker Compose infrastructure
+packages/
+  shared/     Shared JSON schemas
 ```
 
-## 🚀 Oppure caricala su [streamlit.io](https://share.streamlit.io)
-1. Crea un nuovo repo su GitHub
-2. Carica `app.py` e `requirements.txt`
-3. Vai su [streamlit.io](https://share.streamlit.io) e collega il repo
+## Prerequisites
 
----
+- Node.js 18+
+- Python 3.11+
+- Docker (for Postgres)
+
+## Setup
+
+### Web
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+### API
+
+```bash
+cd apps/api
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+### Infrastructure
+
+```bash
+docker compose -f infra/docker-compose.yml up -d
+```
+
+## Makefile shortcuts
+
+```bash
+make dev-web     # run the Next.js dev server
+make dev-api     # run the FastAPI server
+make test        # run API tests and web lint
+```
+
+## Environment Variables
+
+- `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` are configured in
+  `infra/docker-compose.yml` for local development.
