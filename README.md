@@ -25,6 +25,14 @@ packages/
 ### Web
 
 ```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+### API
+
+```bash
 
 ```bash
 cd apps/web
@@ -89,6 +97,18 @@ Fetch the latest KPI snapshot set:
 curl "http://localhost:8000/kpis/latest?organization_id=<ORG_UUID>"
 ```
 
+### Authentication
+
+```bash
+curl -X POST http://localhost:8000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"organization_id":"<ORG_UUID>","email":"user@example.com","password":"changeme"}'
+
+curl -X POST http://localhost:8000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"changeme"}'
+```
+
 ### Infrastructure
 
 ```bash
@@ -109,3 +129,7 @@ make test        # run API tests and web lint
   `infra/docker-compose.yml` for local development.
 - `DATABASE_URL` configures the API database connection (defaults to local
   Postgres).
+- `JWT_SECRET` configures the JWT signing secret for auth.
+- `JWT_ISSUER` configures the JWT issuer (default: `aion`).
+- `ACCESS_TTL_MIN` sets the access token TTL in minutes (default: `15`).
+- `REFRESH_TTL_DAYS` sets the refresh token TTL in days (default: `30`).

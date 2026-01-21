@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.db import get_database_url
+from app.routers.auth import router as auth_router
 from app.routers.health import router as health_router
 from app.routers.kpis import router as kpis_router
 from app.routers.strategist import router as strategist_router
@@ -18,6 +19,7 @@ app.include_router(uploads_router)
 app.include_router(kpis_router)
 app.include_router(health_router)
 app.include_router(strategist_router)
+app.include_router(auth_router)
 app = FastAPI(title="AION OS API", version="0.1.0")
 
 

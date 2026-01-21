@@ -23,6 +23,7 @@ class Organization(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     users: Mapped[list[User]] = relationship(back_populates="organization")
+    memberships: Mapped[list[OrgMembership]] = relationship(back_populates="organization")
     uploads: Mapped[list[Upload]] = relationship(back_populates="organization")
     bank_transactions: Mapped[list[BankTransaction]] = relationship(back_populates="organization")
     invoices: Mapped[list[Invoice]] = relationship(back_populates="organization")
@@ -43,6 +44,12 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
     full_name: Mapped[str | None] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(100), default="member")
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    organization: Mapped[Organization] = relationship(back_populates="users")
+    memberships: Mapped[list[OrgMembership]] = relationship(back_populates="user")
+    sessions: Mapped[list[Session]] = relationship(back_populates="user")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     organization: Mapped[Organization] = relationship(back_populates="users")
@@ -179,3 +186,30 @@ class StrategyBrief(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     organization: Mapped[Organization] = relationship(back_populates="strategy_briefs")
+
+
+class OrgMembership(Base):
+    __tablename__ = "org_memberships"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    role: Mapped[str] = mapped_column(String(100), default="member")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    organization: Mapped[Organization] = relationship(back_populates="memberships")
+    user: Mapped[User] = relationship(back_populates="memberships")
+
+
+class Session(Base):
+    __tablename__ = "sessions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    user: Mapped[User] = relationship(back_populates="sessions")
