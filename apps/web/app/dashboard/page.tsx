@@ -17,7 +17,7 @@ type KpiLatestResponse = {
   metrics: Record<string, number>;
 };
 
-type Insight = {
+type InsightApi = {
   id: string;
   title: string;
   body: string;
@@ -27,11 +27,11 @@ type Insight = {
 
 type InsightsResponse = {
   organization_id: string;
-  insights: Insight[];
+  insights: InsightApi[];
 };
 
-const severityStyles: Record<Insight["severity"], string> = {
-  info: "bg-slate-800 text-slate-200",
+const severityStyles: Record<"low" | "medium" | "high", string> = {
+  low: "bg-slate-800 text-slate-200",
   medium: "bg-amber-500/20 text-amber-200",
   high: "bg-rose-500/20 text-rose-200"
 };
@@ -40,7 +40,7 @@ export default function DashboardPage() {
   const [organizationId, setOrganizationId] = useState("");
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [kpis, setKpis] = useState<KpiLatestResponse | null>(null);
-  const [insights, setInsights] = useState<InsightsResponse | null>(null);
+  const [insights, setInsights] = useState<InsightApi[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,7 +60,7 @@ export default function DashboardPage() {
       ]);
       setHealth(healthResponse);
       setKpis(kpiResponse);
-      setInsights(insightResponse);
+      setInsights(insightResponse.insights);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load dashboard data.");
     } finally {
@@ -167,12 +167,15 @@ export default function DashboardPage() {
           {isLoading && <span className="text-xs text-slate-400">Refreshing...</span>}
         </div>
         <div className="mt-4 space-y-4">
-          {insights && insights.insights.length > 0 ? (
-            insights.insights.map((insight) => (
+          {insights.length > 0 ? (
+            insights.map((insight) => {
+              const severity =
+                insight.severity === "info" ? "low" : insight.severity;
+              return (
               <div key={insight.id} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${severityStyles[insight.severity]}`}>
-                    {insight.severity.toUpperCase()}
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${severityStyles[severity]}`}>
+                    {severity.toUpperCase()}
                   </span>
                   <h3 className="text-base font-semibold text-white">{insight.title}</h3>
                 </div>
@@ -181,7 +184,8 @@ export default function DashboardPage() {
                   {new Date(insight.created_at).toLocaleString()}
                 </p>
               </div>
-            ))
+              );
+            })
           ) : (
             <p className="text-sm text-slate-300">
               {organizationId ? "No insights available." : "Enter an organization ID to view insights."}
