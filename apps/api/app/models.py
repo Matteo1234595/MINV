@@ -5,6 +5,7 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
@@ -49,6 +50,9 @@ class User(Base):
     organization: Mapped[Organization] = relationship(back_populates="users")
     memberships: Mapped[list[OrgMembership]] = relationship(back_populates="user")
     sessions: Mapped[list[Session]] = relationship(back_populates="user")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    organization: Mapped[Organization] = relationship(back_populates="users")
     uploads: Mapped[list[Upload]] = relationship(back_populates="uploader")
 
 
