@@ -33,6 +33,46 @@ npm run dev
 ### API
 
 ```bash
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+### API
+
+```bash
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+### API
+
+```bash
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+### API
+
+```bash
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+### API
+
+```bash
 cd apps/api
 python -m venv .venv
 source .venv/bin/activate
