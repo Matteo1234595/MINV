@@ -30,6 +30,7 @@ class Organization(Base):
     health_scores: Mapped[list[HealthScore]] = relationship(back_populates="organization")
     insights: Mapped[list[Insight]] = relationship(back_populates="organization")
     actions: Mapped[list[Action]] = relationship(back_populates="organization")
+    strategy_briefs: Mapped[list[StrategyBrief]] = relationship(back_populates="organization")
 
 
 class User(Base):
@@ -164,3 +165,17 @@ class Action(Base):
 
     organization: Mapped[Organization] = relationship(back_populates="actions")
     insight: Mapped[Insight | None] = relationship(back_populates="actions")
+
+
+class StrategyBrief(Base):
+    __tablename__ = "strategy_briefs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+    )
+    content: Mapped[str] = mapped_column(Text(), nullable=False)
+    context: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    organization: Mapped[Organization] = relationship(back_populates="strategy_briefs")
