@@ -25,6 +25,8 @@ packages/
 ### Web
 
 ```bash
+
+```bash
 cd apps/web
 npm install
 npm run dev
@@ -69,6 +71,22 @@ curl -F "organization_id=<ORG_UUID>" -F "file=@packages/shared/samples/bank_tran
 
 curl -F "organization_id=<ORG_UUID>" -F "file=@packages/shared/samples/invoices.csv" \\
   http://localhost:8000/uploads/invoices
+```
+
+### KPI Computation
+
+Recompute monthly KPI snapshots for an organization:
+
+```bash
+curl -X POST http://localhost:8000/kpis/recompute \
+  -H "Content-Type: application/json" \
+  -d '{"organization_id":"<ORG_UUID>"}'
+```
+
+Fetch the latest KPI snapshot set:
+
+```bash
+curl "http://localhost:8000/kpis/latest?organization_id=<ORG_UUID>"
 ```
 
 ### Infrastructure
