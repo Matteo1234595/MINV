@@ -48,6 +48,14 @@ export default function HomePage() {
           Connect the API at <span className="font-mono">/health</span> to keep the
           dashboard informed.
         </p>
+        <div className="mt-4">
+          <a
+            href="/dashboard"
+            className="inline-flex items-center rounded-full border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-semibold text-white transition hover:border-slate-500"
+          >
+            Go to Dashboard
+          </a>
+        </div>
       </section>
     </main>
   );

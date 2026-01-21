@@ -53,12 +53,34 @@ npm run dev
 ### API
 
 ```bash
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+### API
+
+```bash
 cd apps/api
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
+
+### Dashboard
+
+Set the API URL and launch Next.js:
+
+```bash
+cd apps/web
+export NEXT_PUBLIC_API_URL=http://localhost:8000
+npm run dev
+```
+
+Open `http://localhost:3000/dashboard` and provide an organization UUID plus JWT token if needed.
 
 ### Migrations
 

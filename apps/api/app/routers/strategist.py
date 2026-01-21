@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.models import Action
 from app.services.action_engine import generate_actions, open_actions
 from app.services.strategist import generate_strategy_brief, latest_strategy_brief
 
@@ -35,6 +36,10 @@ class ActionResponse(BaseModel):
 class ActionsResponse(BaseModel):
     organization_id: uuid.UUID
     actions: list[ActionResponse]
+
+
+class ActionUpdateRequest(BaseModel):
+    status: str
 
 
 @router.post("/strategist/brief", response_model=StrategyBriefResponse)
@@ -104,4 +109,26 @@ def get_open_actions(organization_id: uuid.UUID, db: Session = Depends(get_db)):
             )
             for action in actions
         ],
+    )
+
+
+@router.patch("/actions/{action_id}", response_model=ActionResponse)
+def update_action(action_id: uuid.UUID, payload: ActionUpdateRequest, db: Session = Depends(get_db)):
+    action = db.query(Action).filter(Action.id == action_id).first()
+    if action is None:
+        raise HTTPException(status_code=404, detail="Action not found")
+    if payload.status not in {"open", "done"}:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    action.status = payload.status
+    db.add(action)
+    db.commit()
+    db.refresh(action)
+    return ActionResponse(
+        id=action.id,
+        organization_id=action.organization_id,
+        insight_id=action.insight_id,
+        title=action.title,
+        status=action.status,
+        due_at=action.due_at,
+        created_at=action.created_at,
     )
