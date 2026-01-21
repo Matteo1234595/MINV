@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import get_database_url
 from app.ai.router import router as ai_router
@@ -9,6 +10,14 @@ from app.routers.strategist import router as strategist_router
 from app.routers.uploads import router as uploads_router
 
 app = FastAPI(title="AION OS API", version="0.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
