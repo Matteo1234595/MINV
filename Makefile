@@ -1,4 +1,5 @@
 .PHONY: dev dev-web dev-api test test-web test-api db-migrate db-seed
+.PHONY: dev dev-web dev-api test test-web test-api
 
 DEV_WEB_CMD = npm --prefix apps/web run dev
 DEV_API_CMD = uvicorn app.main:app --reload --app-dir apps/api
