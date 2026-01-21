@@ -25,6 +25,18 @@ packages/
 ### Web
 
 ```bash
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+### API
+
+```bash
+
+```bash
 cd apps/web
 npm install
 npm run dev
