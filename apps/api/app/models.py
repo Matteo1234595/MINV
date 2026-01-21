@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -26,6 +27,7 @@ class Organization(Base):
     bank_transactions: Mapped[list[BankTransaction]] = relationship(back_populates="organization")
     invoices: Mapped[list[Invoice]] = relationship(back_populates="organization")
     kpi_snapshots: Mapped[list[KpiSnapshot]] = relationship(back_populates="organization")
+    health_scores: Mapped[list[HealthScore]] = relationship(back_populates="organization")
     insights: Mapped[list[Insight]] = relationship(back_populates="organization")
     actions: Mapped[list[Action]] = relationship(back_populates="organization")
 
@@ -114,6 +116,21 @@ class KpiSnapshot(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     organization: Mapped[Organization] = relationship(back_populates="kpi_snapshots")
+
+
+class HealthScore(Base):
+    __tablename__ = "health_scores"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+    )
+    score: Mapped[int] = mapped_column(nullable=False)
+    components: Mapped[dict[str, float | dict[str, float]]] = mapped_column(JSONB, nullable=False)
+    computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    organization: Mapped[Organization] = relationship(back_populates="health_scores")
 
 
 class Insight(Base):
