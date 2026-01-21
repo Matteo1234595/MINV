@@ -12,6 +12,7 @@ def configure_database() -> None:
 
 
 app.include_router(uploads_router)
+app = FastAPI(title="AION OS API", version="0.1.0")
 
 
 @app.get("/health")
