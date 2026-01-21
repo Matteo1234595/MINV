@@ -109,6 +109,14 @@ curl -X POST http://localhost:8000/auth/login \
   -d '{"email":"user@example.com","password":"changeme"}'
 ```
 
+### AION Copilot
+
+```bash
+curl -X POST http://localhost:8000/ai/chat \
+  -H "Content-Type: application/json" \
+  -d '{"organization_id":"<ORG_UUID>","message":"Summarize our latest financial risks."}'
+```
+
 ### Infrastructure
 
 ```bash
@@ -133,3 +141,6 @@ make test        # run API tests and web lint
 - `JWT_ISSUER` configures the JWT issuer (default: `aion`).
 - `ACCESS_TTL_MIN` sets the access token TTL in minutes (default: `15`).
 - `REFRESH_TTL_DAYS` sets the refresh token TTL in days (default: `30`).
+- `OPENAI_API_KEY` configures the OpenAI API key for Copilot.
+- `OPENAI_MODEL` sets the Copilot model (default: `gpt-4o-mini`).
+- `OPENAI_BASE_URL` optionally overrides the OpenAI API base URL.
