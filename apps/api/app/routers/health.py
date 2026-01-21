@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.models import Insight
 from app.services.health import (
     compute_health_score,
     generate_insights,
@@ -31,6 +32,19 @@ class InsightsRecomputeResponse(BaseModel):
     health_score: int
     computed_at: datetime
     insights_created: int
+
+
+class InsightResponse(BaseModel):
+    id: uuid.UUID
+    title: str
+    body: str
+    severity: str
+    created_at: datetime
+
+
+class InsightsLatestResponse(BaseModel):
+    organization_id: uuid.UUID
+    insights: list[InsightResponse]
 
 
 @router.get("/health/latest", response_model=HealthScoreResponse)
@@ -71,4 +85,33 @@ def recompute_insights(
         health_score=score.score,
         computed_at=score.computed_at,
         insights_created=len(insights),
+    )
+
+
+@router.get("/insights/latest", response_model=InsightsLatestResponse)
+def latest_insights(
+    organization_id: uuid.UUID,
+    limit: int = Query(default=8, ge=1, le=20),
+    db: Session = Depends(get_db),
+):
+    rows = (
+        db.query(Insight)
+        .filter(Insight.organization_id == organization_id)
+        .order_by(Insight.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+    return InsightsLatestResponse(
+        organization_id=organization_id,
+        insights=[
+            InsightResponse(
+                id=row.id,
+                title=row.title,
+                body=row.body,
+                severity=row.severity,
+                created_at=row.created_at,
+            )
+            for row in rows
+        ],
     )
