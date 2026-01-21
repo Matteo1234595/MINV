@@ -58,6 +58,19 @@ make db-migrate
 make db-seed
 ```
 
+### CSV Ingestion
+
+CSV templates live in `packages/shared/samples`. Uploads expect ISO-8601 timestamps
+for date fields.
+
+```bash
+curl -F "organization_id=<ORG_UUID>" -F "file=@packages/shared/samples/bank_transactions.csv" \\
+  http://localhost:8000/uploads/bank-transactions
+
+curl -F "organization_id=<ORG_UUID>" -F "file=@packages/shared/samples/invoices.csv" \\
+  http://localhost:8000/uploads/invoices
+```
+
 ### Infrastructure
 
 ```bash
