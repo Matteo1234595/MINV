@@ -3,6 +3,9 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { apiFetch, clearTokens, getTokens, setTokens } from "../../lib/api";
+import { useCallback, useEffect, useState } from "react";
+
+import { apiFetch } from "../../lib/api";
 
 type HealthResponse = {
   organization_id: string;
@@ -63,6 +66,8 @@ export default function DashboardPage() {
   const [copilotResponse, setCopilotResponse] = useState<string | null>(null);
   const [copilotLoading, setCopilotLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(getTokens()));
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const loadDashboard = useCallback(async () => {
     if (!organizationId) {
@@ -78,6 +83,10 @@ export default function DashboardPage() {
         apiFetch<KpiLatestResponse>(`/kpis/latest?organization_id=${organizationId}`),
         apiFetch<InsightsResponse>(`/insights/latest?organization_id=${organizationId}`),
         apiFetch<ActionsResponse>(`/actions/open?organization_id=${organizationId}`)
+      const [healthResponse, kpiResponse, insightResponse] = await Promise.all([
+        apiFetch<HealthResponse>(`/health/latest?organization_id=${organizationId}`),
+        apiFetch<KpiLatestResponse>(`/kpis/latest?organization_id=${organizationId}`),
+        apiFetch<InsightsResponse>(`/insights/latest?organization_id=${organizationId}`)
       ]);
       setHealth(healthResponse);
       setKpis(kpiResponse);
@@ -251,6 +260,24 @@ export default function DashboardPage() {
             </div>
           </form>
         </div>
+          <button
+            type="button"
+            onClick={handleRecompute}
+            disabled={!organizationId || isLoading}
+            className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-semibold text-white transition hover:border-slate-500 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Recompute
+          </button>
+        </div>
+        <label className="flex flex-col gap-2 text-sm text-slate-300">
+          Organization ID
+          <input
+            value={organizationId}
+            onChange={(event) => setOrganizationId(event.target.value)}
+            placeholder="UUID"
+            className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-white placeholder:text-slate-500"
+          />
+        </label>
         {error && (
           <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 p-3 text-sm text-rose-200">
             {error}
@@ -350,6 +377,15 @@ export default function DashboardPage() {
             ) : (
               <p className="text-sm text-slate-400">No open actions.</p>
             )}
+            {kpis &&
+              Object.entries(kpis.metrics).map(([metric, value]) => (
+                <div key={metric} className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    {metric.replace(/_/g, " ")}
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-white">{value.toFixed(2)}</p>
+                </div>
+              ))}
           </div>
         </div>
       </section>
@@ -384,6 +420,35 @@ export default function DashboardPage() {
             {copilotResponse}
           </div>
         )}
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Insights</p>
+          {isLoading && <span className="text-xs text-slate-400">Refreshing...</span>}
+        </div>
+        <div className="mt-4 space-y-4">
+          {insights.length > 0 ? (
+            insights.map((insight) => {
+              const severity =
+                insight.severity === "info" ? "low" : insight.severity;
+              return (
+              <div key={insight.id} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${severityStyles[severity]}`}>
+                    {severity.toUpperCase()}
+                  </span>
+                  <h3 className="text-base font-semibold text-white">{insight.title}</h3>
+                </div>
+                <p className="mt-2 text-sm text-slate-300">{insight.body}</p>
+                <p className="mt-2 text-xs text-slate-500">
+                  {new Date(insight.created_at).toLocaleString()}
+                </p>
+              </div>
+              );
+            })
+          ) : (
+            <p className="text-sm text-slate-300">
+              {organizationId ? "No insights available." : "Enter an organization ID to view insights."}
+            </p>
+          )}
+        </div>
       </section>
     </main>
   );
